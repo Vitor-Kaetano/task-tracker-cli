@@ -1,0 +1,1 @@
+const algumacoisa = 3;
