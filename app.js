@@ -4,7 +4,6 @@ const path = './taskList.json'
 const command = process.argv[2];
 const args = process.argv.slice(3);
 
-
 function add(args){
     if (!fs.existsSync(path)) {
         const content = "[]"       
@@ -36,14 +35,38 @@ function add(args){
     console.log("Tarefa adicionada com sucesso")
 }
 
-//function list(){
+function list(args){
+    const dados = fs.readFileSync(path, 'utf-8')
+    let tasks = JSON.parse(dados);
 
-//}
+    
+
+
+    
+    for(const task of tasks){
+
+        if(task.status !== args[0])
+            continue
+
+        console.log("=================================");
+        console.log(`ID: ${task.id}`);
+        console.log(`Description: ${task.description}`);
+        console.log(`Status: ${task.status}`);
+        console.log(`Created at:: ${task.createdAt}`);
+        console.log(`Updated at:: ${task.updatedAt}`);
+        console.log("=================================\n");
+        
+    
+    }
+}
+    
+
+
 
 
 const commands = {
     add: add,
-    //list: list,
+    list: list,
 };
 
 if (commands[command]) {
