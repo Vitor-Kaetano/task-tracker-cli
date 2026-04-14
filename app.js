@@ -38,25 +38,33 @@ function add(args){
 function list(args){
     const dados = fs.readFileSync(path, 'utf-8')
     let tasks = JSON.parse(dados);
-
     
+    const statusValidos = ["todo", "done", "in-progress"];
+
+    if (args[0] && !statusValidos.includes(args[0])) {
+        console.log("Status inválido. Use: todo | done | in-progress");
+        return;
+    }
 
 
-    
+
     for(const task of tasks){
 
-        if(task.status !== args[0])
-            continue
+        if(args[0] && task.status !== args[0]) continue;
+        
+        found = True;
 
         console.log("=================================");
         console.log(`ID: ${task.id}`);
         console.log(`Description: ${task.description}`);
         console.log(`Status: ${task.status}`);
-        console.log(`Created at:: ${task.createdAt}`);
-        console.log(`Updated at:: ${task.updatedAt}`);
-        console.log("=================================\n");
-        
-    
+        console.log(`Created at: ${task.createdAt}`);
+        console.log(`Updated at: ${task.updatedAt}`);
+        console.log("=================================\n");  
+    }
+
+    if(!found){
+        console.log("Nenhuma tarefa encontrada.")
     }
 }
     
