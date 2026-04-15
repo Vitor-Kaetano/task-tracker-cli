@@ -4,6 +4,19 @@ const path = './taskList.json'
 const command = process.argv[2];
 const args = process.argv.slice(3);
 
+function registerTasks(tasks){
+    fs.writeFileSync('taskList.json', JSON.stringify(tasks, null, 2));
+}
+function displayTasks(task){
+        console.log("=================================");
+        console.log(`ID: ${task.id}`);
+        console.log(`Description: ${task.description}`);
+        console.log(`Status: ${task.status}`);
+        console.log(`Created at: ${task.createdAt}`);
+        console.log(`Updated at: ${task.updatedAt}`);
+        console.log("=================================\n");
+}
+
 function add(args){
     if (!fs.existsSync(path)) {
         const content = "[]"       
@@ -30,14 +43,14 @@ function add(args){
 
     tasks.push(newTask)
 
-    fs.writeFileSync('taskList.json', JSON.stringify(tasks, null, 2));
+    registerTasks(tasks)
     
     console.log("Tarefa adicionada com sucesso")
+    displayTasks(newTask);
 }
 
 function list(args){
-    const dados = fs.readFileSync(path, 'utf-8')
-    let tasks = JSON.parse(dados);
+    const tasks = JSON.parse(fs.readFileSync(path, 'utf-8'));
     
     const statusValidos = ["todo", "done", "in-progress"];
 
@@ -52,15 +65,9 @@ function list(args){
 
         if(args[0] && task.status !== args[0]) continue;
         
-        found = True;
+        var found = true;
 
-        console.log("=================================");
-        console.log(`ID: ${task.id}`);
-        console.log(`Description: ${task.description}`);
-        console.log(`Status: ${task.status}`);
-        console.log(`Created at: ${task.createdAt}`);
-        console.log(`Updated at: ${task.updatedAt}`);
-        console.log("=================================\n");  
+        displayTasks(task)  
     }
 
     if(!found){
@@ -68,13 +75,34 @@ function list(args){
     }
 }
     
+function update(args){
+    //node app.js 1 "estudar nodejs"
+    //casos onde pode quebrar, id não encontrado
+    let tasks = JSON.parse(fs.readFileSync(path, 'utf-8'));
 
+    const id = args[0]
+    const newDesc = args[1]
+
+    for (const task of tasks){
+        //iterar até encontrar o  id que foi informado
+        if(task.id == id){
+            task.description = newDesc
+            console.log("Descrição da tarefa alterada com sucesso");
+            displayTasks(task);
+            break;
+        }else if(task === tasks[tasks.length-1]){
+        console.log("ID não encontrado")
+        }      
+    }
+    registerTasks(tasks)
+}
 
 
 
 const commands = {
     add: add,
     list: list,
+    update: update,
 };
 
 if (commands[command]) {
