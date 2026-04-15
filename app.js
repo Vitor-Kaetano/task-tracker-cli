@@ -1,150 +1,209 @@
-const fs = require('fs')
-const path = './taskList.json'
+const fs = require('fs');
+const path = './taskList.json';
 
 const command = process.argv[2];
 const args = process.argv.slice(3);
 
-function registerTasks(tasks){
-    fs.writeFileSync('taskList.json', JSON.stringify(tasks, null, 2));
-}
-function displayTasks(task){
-        console.log("=================================");
-        console.log(`ID: ${task.id}`);
-        console.log(`Description: ${task.description}`);
-        console.log(`Status: ${task.status}`);
-        console.log(`Created at: ${task.createdAt}`);
-        console.log(`Updated at: ${task.updatedAt}`);
-        console.log("=================================\n");
+// =========================
+// FILESYSTEM
+// =========================
+
+function loadTasks() {
+    if (!fs.existsSync(path)) return [];
+    return JSON.parse(fs.readFileSync(path, 'utf-8'));
 }
 
-function checkId(task,id,tasks){
-    if(task.id == id){
-        return true
-    }else if(task === tasks[tasks.length-1]){
-        console.log("ID não encontrado")
-        return false
-    }
+function saveTasks(tasks) {
+    fs.writeFileSync(path, JSON.stringify(tasks, null, 2));
 }
-function add(args){
-    if (!fs.existsSync(path)) {
-        const content = "[]"       
-        fs.writeFileSync(path, content, 'utf-8')
-        console.log(`Arquivo ${path} criado com sucesso!`);
+
+// =========================
+// UTIL
+// =========================
+
+function displayTask(task) {
+    console.log("=================================");
+    console.log(`ID: ${task.id}`);
+    console.log(`Description: ${task.description}`);
+    console.log(`Status: ${task.status}`);
+    console.log(`Created at: ${task.createdAt}`);
+    console.log(`Updated at: ${task.updatedAt}`);
+    console.log("=================================\n");
+}
+
+function findTaskById(tasks, id) {
+    return tasks.find(task => task.id == id);
+}
+
+function generateId(tasks) {
+    return tasks.length > 0
+        ? Math.max(...tasks.map(t => t.id)) + 1
+        : 1;
+}
+
+// =========================
+// CORE ACTIONS
+// =========================
+
+function add(args) {
+    const description = args[0];
+
+    if (!description) {
+        console.log("Uso: add <descricao>");
+        return;
     }
 
-    let tasks = [];
-    
-    const dados = fs.readFileSync('taskList.json', 'utf-8')
-    tasks = JSON.parse(dados);
-    
-    const novoId = tasks.length > 0
-    ? Math.max(...tasks.map(t => t.id)) + 1
-    : 1; 
-    
+    const tasks = loadTasks();
+
     const newTask = {
-        id: novoId,
-        description: args[0],
+        id: generateId(tasks),
+        description,
         status: "todo",
         createdAt: new Date().toLocaleString('pt-BR'),
-        updatedAt: new Date().toLocaleString('pt-BR')        
-    }
+        updatedAt: new Date().toLocaleString('pt-BR')
+    };
 
-    tasks.push(newTask)
+    tasks.push(newTask);
+    saveTasks(tasks);
 
-    registerTasks(tasks)
-    
-    console.log("Tarefa adicionada com sucesso")
-    displayTasks(newTask);
+    console.log("Tarefa adicionada com sucesso");
+    displayTask(newTask);
 }
 
-function list(args){
-    const tasks = JSON.parse(fs.readFileSync(path, 'utf-8'));
-    
-    const statusValidos = ["todo", "done", "in-progress"];
+// =========================
 
-    if (args[0] && !statusValidos.includes(args[0])) {
+function list(args) {
+    const tasks = loadTasks();
+    const status = args[0];
+
+    const validStatus = ["todo", "done", "in-progress"];
+
+    if (status && !validStatus.includes(status)) {
         console.log("Status inválido. Use: todo | done | in-progress");
         return;
     }
 
+    let found = false;
 
+    for (const task of tasks) {
+        if (status && task.status !== status) continue;
 
-    for(const task of tasks){
-
-        if(args[0] && task.status !== args[0]) continue;
-        
-        var found = true;
-
-        displayTasks(task)  
+        found = true;
+        displayTask(task);
     }
 
-    if(!found){
-        console.log("Nenhuma tarefa encontrada.")
+    if (!found) {
+        console.log("Nenhuma tarefa encontrada.");
     }
 }
-    
-function update(args){
-    //node app.js 1 "estudar nodejs"
-    //casos onde pode quebrar, id não encontrado
-    let tasks = JSON.parse(fs.readFileSync(path, 'utf-8'));
 
-    const id = args[0]
-    const newDesc = args[1]
+// =========================
 
-    for (const task of tasks){
-        //iterar até encontrar o  id que foi informado
-        if(checkId(task, id, tasks)){
-            task.description = newDesc
-            console.log("Descrição da tarefa alterada com sucesso");
-            displayTasks(task);
-            break;
-        }
-    }
-    registerTasks(tasks)
-    
-}
+function update(args) {
+    const id = args[0];
+    const newDesc = args[1];
 
-function markInProgress(args){
-    let tasks = JSON.parse(fs.readFileSync(path, 'utf-8'));
-
-    const id = args[0]
-
-    for (const task of tasks){
-        if(checkId(task, id, tasks)){
-            task.status = "In-Progress"
-            console.log("Status da tarefa alterado com sucesso");
-            displayTasks(task);
-            break;
-        }
+    if (!id || !newDesc) {
+        console.log("Uso: update <id> <descricao>");
+        return;
     }
 
-    registerTasks(tasks)
+    updateTask(id, task => {
+        task.description = newDesc;
+    });
 }
 
-function markDone(args){
-    let tasks = JSON.parse(fs.readFileSync(path, 'utf-8'));
+// =========================
 
-    const id = args[0]
+function markInProgress(args) {
+    const id = args[0];
 
-    for (const task of tasks){
-        if(checkId(task, id, tasks)){
-            task.status = "Done"
-            console.log("Status da tarefa alterado com sucesso");
-            displayTasks(task);
-            break;
-        }
+    if (!id) {
+        console.log("Uso: mark-in-progress <id>");
+        return;
     }
 
-    registerTasks(tasks)
+    updateTask(id, task => {
+        task.status = "in-progress";
+    });
 }
 
+// =========================
+
+function markDone(args) {
+    const id = args[0];
+
+    if (!id) {
+        console.log("Uso: mark-done <id>");
+        return;
+    }
+
+    updateTask(id, task => {
+        task.status = "done";
+    });
+}
+
+// =========================
+
+function deleteTask(args) {
+    const id = args[0];
+
+    if (!id) {
+        console.log("Uso: delete <id>");
+        return;
+    }
+
+    const tasks = loadTasks();
+
+    const index = tasks.findIndex(t => t.id == id);
+
+    if (index === -1) {
+        console.log("ID não encontrado");
+        return;
+    }
+
+    const removed = tasks.splice(index, 1)[0];
+
+    saveTasks(tasks);
+
+    console.log("Tarefa deletada com sucesso");
+    displayTask(removed);
+}
+
+// =========================
+// GENERIC UPDATE
+// =========================
+
+function updateTask(id, updater) {
+    const tasks = loadTasks();
+
+    const task = findTaskById(tasks, id);
+
+    if (!task) {
+        console.log("ID não encontrado");
+        return;
+    }
+
+    updater(task);
+    task.updatedAt = new Date().toLocaleString('pt-BR');
+
+    saveTasks(tasks);
+
+    console.log("Tarefa atualizada com sucesso");
+    displayTask(task);
+}
+
+// =========================
+// COMMAND DISPATCH
+// =========================
 
 const commands = {
-    add: add,
-    list: list,
-    update: update,
+    add,
+    list,
+    update,
     "mark-in-progress": markInProgress,
-    "mark-done": markDone
+    "mark-done": markDone,
+    delete: deleteTask
 };
 
 if (commands[command]) {
