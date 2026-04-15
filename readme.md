@@ -1,4 +1,3 @@
-```markdown
 # 📌 Task Tracker CLI
 
 Uma aplicação simples de linha de comando (CLI) para gerenciamento de tarefas, desenvolvida com Node.js. Este projeto foi baseado no desafio Task Tracker do roadmap.sh e tem como objetivo praticar manipulação de arquivos, entrada de dados via terminal e organização de código.
@@ -7,39 +6,39 @@ Uma aplicação simples de linha de comando (CLI) para gerenciamento de tarefas,
 
 ## 🚀 Funcionalidades
 
-- Adicionar novas tarefas
-- Atualizar descrição de tarefas
-- Deletar tarefas
-- Marcar tarefas como:
-  - `todo` (a fazer)
-  - `in-progress` (em andamento)
-  - `done` (concluída)
-- Listar:
-  - Todas as tarefas
-  - Tarefas filtradas por status
+* Adicionar novas tarefas
+* Atualizar descrição de tarefas
+* Deletar tarefas
+* Marcar tarefas como:
+
+  * `todo` (a fazer)
+  * `in-progress` (em andamento)
+  * `done` (concluída)
+* Listar:
+
+  * Todas as tarefas
+  * Tarefas filtradas por status
 
 ---
 
 ## 🧱 Estrutura do Projeto
 
 ```
-
 .
 ├── app.js
 ├── taskList.json
 └── README.md
+```
 
-````
-
-- `app.js` → Aplicação principal (CLI)
-- `taskList.json` → Arquivo de persistência das tarefas
-- `README.md` → Documentação do projeto
+* `app.js` → Aplicação principal (CLI)
+* `taskList.json` → Arquivo de persistência das tarefas
+* `README.md` → Documentação do projeto
 
 ---
 
 ## ⚙️ Requisitos
 
-- Node.js instalado (recomendado versão 14 ou superior)
+* Node.js instalado (versão 14 ou superior recomendada)
 
 ---
 
@@ -49,7 +48,7 @@ Execute os comandos no terminal utilizando:
 
 ```bash
 node app.js <comando> [argumentos]
-````
+```
 
 ---
 
@@ -61,23 +60,17 @@ node app.js <comando> [argumentos]
 node app.js add "Comprar comida"
 ```
 
----
-
 ### ✏️ Atualizar uma tarefa
 
 ```bash
 node app.js update 1 "Comprar comida e cozinhar"
 ```
 
----
-
 ### ❌ Deletar uma tarefa
 
 ```bash
 node app.js delete 1
 ```
-
----
 
 ### 🔄 Atualizar status da tarefa
 
@@ -93,17 +86,15 @@ node app.js mark-in-progress 1
 node app.js mark-done 1
 ```
 
----
-
 ### 📋 Listar tarefas
 
-#### Listar todas as tarefas
+#### Listar todas
 
 ```bash
 node app.js list
 ```
 
-#### Listar por status
+#### Filtrar por status
 
 ```bash
 node app.js list todo
@@ -114,8 +105,6 @@ node app.js list done
 ---
 
 ## 🗂️ Estrutura da Tarefa
-
-Cada tarefa possui o seguinte formato:
 
 ```json
 {
@@ -131,8 +120,6 @@ Cada tarefa possui o seguinte formato:
 
 ## 🧠 Conceitos Praticados
 
-Este projeto aborda:
-
 * Manipulação de arquivos com `fs`
 * Persistência de dados em JSON
 * Leitura de argumentos via CLI (`process.argv`)
@@ -145,7 +132,7 @@ Este projeto aborda:
 
 ## ⚠️ Tratamento de Erros
 
-A aplicação considera cenários como:
+A aplicação trata cenários como:
 
 * Argumentos ausentes
 * Comandos inválidos
@@ -157,27 +144,25 @@ A aplicação considera cenários como:
 
 ## 📌 Decisões de Projeto
 
-* **Uso de JSON como banco de dados**: solução simples para fins de aprendizado
-* **Operações síncronas no filesystem**: simplifica o fluxo do programa
-* **Dispatcher de comandos**: evita múltiplos blocos condicionais
+* **JSON como banco de dados**: solução simples para aprendizado
+* **Filesystem síncrono**: simplifica o fluxo do programa
+* **Dispatcher de comandos**: evita múltiplos condicionais
 * **Função genérica de atualização**: reduz duplicação de código
 
 ---
 
 ## 🔧 Melhorias Futuras
 
-* Migrar para operações assíncronas no filesystem
+* Migrar para operações assíncronas
 * Adicionar testes automatizados
-* Melhorar a experiência no terminal (cores, formatação)
-* Transformar em um pacote CLI instalável via npm
-* Implementar busca e ordenação de tarefas
-* Adicionar categorias ou tags
+* Melhorar UX no terminal (cores, formatação)
+* Transformar em CLI instalável via npm
+* Implementar busca e ordenação
+* Adicionar categorias/tags
 
 ---
 
 ## 📚 Referência
-
-Projeto baseado em:
 
 [https://roadmap.sh/projects/task-tracker](https://roadmap.sh/projects/task-tracker)
 
@@ -186,6 +171,3 @@ Projeto baseado em:
 ## 📝 Licença
 
 Este projeto está disponível sob a licença MIT.
-
-```
-```
