@@ -17,6 +17,14 @@ function displayTasks(task){
         console.log("=================================\n");
 }
 
+function checkId(task,id,tasks){
+    if(task.id == id){
+        return true
+    }else if(task === tasks[tasks.length-1]){
+        console.log("ID não encontrado")
+        return false
+    }
+}
 function add(args){
     if (!fs.existsSync(path)) {
         const content = "[]"       
@@ -85,24 +93,58 @@ function update(args){
 
     for (const task of tasks){
         //iterar até encontrar o  id que foi informado
-        if(task.id == id){
+        if(checkId(task, id, tasks)){
             task.description = newDesc
             console.log("Descrição da tarefa alterada com sucesso");
             displayTasks(task);
             break;
-        }else if(task === tasks[tasks.length-1]){
-        console.log("ID não encontrado")
-        }      
+        }
     }
+    registerTasks(tasks)
+    
+}
+
+function markInProgress(args){
+    let tasks = JSON.parse(fs.readFileSync(path, 'utf-8'));
+
+    const id = args[0]
+
+    for (const task of tasks){
+        if(checkId(task, id, tasks)){
+            task.status = "In-Progress"
+            console.log("Status da tarefa alterado com sucesso");
+            displayTasks(task);
+            break;
+        }
+    }
+
     registerTasks(tasks)
 }
 
+function markDone(args){
+    let tasks = JSON.parse(fs.readFileSync(path, 'utf-8'));
+
+    const id = args[0]
+
+    for (const task of tasks){
+        if(checkId(task, id, tasks)){
+            task.status = "Done"
+            console.log("Status da tarefa alterado com sucesso");
+            displayTasks(task);
+            break;
+        }
+    }
+
+    registerTasks(tasks)
+}
 
 
 const commands = {
     add: add,
     list: list,
     update: update,
+    "mark-in-progress": markInProgress,
+    "mark-done": markDone
 };
 
 if (commands[command]) {
